@@ -21,13 +21,12 @@ namespace Sharp_InvokeWMIExec
         {
             //User Params
             string command = "cmd.exe";
-            string hash = "aad3b435b51404eeaad3b435b51404ee:a1be643b5b14ec8a12135d86b5c78616";
-            string username = "Administrator";
+            string hash = "";
+            string username = "";
             string output_username = "";
             bool debugging = false;
             string domain = "";
-            string target = "192.168.1.172";
-            //string target= "127.0.0.1";
+            string target = "";
             string processID = "";
             string target_short = "";
             int sleep = 5;
