@@ -20,7 +20,7 @@ namespace Sharp_InvokeWMIExec
         static void Main(string[] args)
         {
             //User Params
-            string command = "cmd.exe";
+            string command = "";
             string hash = "";
             string username = "";
             string output_username = "";
@@ -30,9 +30,11 @@ namespace Sharp_InvokeWMIExec
             string processID = "";
             string target_short = "";
             int sleep = 5;
+			bool show_help = false;
 
-            //Tracking Params
-            int request_length = 0;
+			//Tracking Params
+
+			int request_length = 0;
             bool  WMI_execute = false;
             int sequence_number_counter = 0;
             int request_split_index_tracker = 0;
@@ -66,7 +68,27 @@ namespace Sharp_InvokeWMIExec
             byte[] WMI_namespace_unicode = null;
             byte[] IPID2 = null;
             int request_split_stage = 0;
-            if (!string.IsNullOrEmpty(command))
+
+
+			OptionSet options = new OptionSet()
+			.Add("?:|help:", "Prints out the options.", h => show_help = true)
+			.Add("t=|target=", "Hostname or IP address of the target.", t => target = t)
+			.Add("u=|username=", "Username to use for authentication.", u => username = u)
+			.Add("d=|domain=", "Domain to use for authentication. This parameter is not needed with local accounts or when using @domain after the username.", d => domain = d)
+			.Add("h=|hash=", "NTLM password hash for authentication. This module will accept either LM:NTLM or NTLM format.", h => hash = h)
+			.Add("c=|command=", "Command to execute on the target. If a command is not specified, the function will check to see if the username and hash provides local admin access on the target.", option => command = option)
+			.Add("sleep=", "Time in seconds to sleep. Change this value if you're getting weird results.", option => sleep = int.Parse(option))
+			.Add("debug:", "Switch, enable debugging", option => debugging = true);
+			options.Parse(args);
+
+
+			if (show_help)
+			{
+				displayHelp();
+				return;
+			}
+
+			if (!string.IsNullOrEmpty(command))
             {
                 WMI_execute = true;
             }
@@ -947,7 +969,7 @@ namespace Sharp_InvokeWMIExec
 
         public static void displayHelp()
         {
-            Console.WriteLine("HELP!");
+            Console.WriteLine("Usage: Sharp-InvokeWMIExec.exe -h=\"hash\" -u=\"test\\username\" -t=\"target\" -c=\"command\" ");
         }
         public static byte[] getByteRange(byte[] array, int start, int end)
         {
