@@ -71,7 +71,7 @@ namespace Sharp_InvokeWMIExec
 			.Add("t=|target=", "Hostname or IP address of the target.", t => target = t)
 			.Add("u=|username=", "Username to use for authentication.", u => username = u)
 			.Add("d=|domain=", "Domain to use for authentication. This parameter is not needed with local accounts or when using @domain after the username.", d => domain = d)
-			.Add("h=|hash=", "NTLM password hash for authentication. This module will accept either LM:NTLM or NTLM format.", h => hash = h)
+			.Add("h=|hash=", "NTLM password hash for authentication. This module will accept either LM:NTLM or NTLM format.", hsh => hash = hsh)
 			.Add("c=|command=", "Command to execute on the target. If a command is not specified, the function will check to see if the username and hash provides local admin access on the target.", option => command = option)
 			.Add("sleep=", "Time in seconds to sleep. Change this value if you're getting weird results.", option => sleep = int.Parse(option))
 			.Add("debug:", "Switch, enable debugging", option => debugging = true);
@@ -80,7 +80,7 @@ namespace Sharp_InvokeWMIExec
 
 			if (show_help)
 			{
-				displayHelp();
+				displayHelp(null,options);
 				return;
 			}
 
@@ -101,15 +101,12 @@ namespace Sharp_InvokeWMIExec
             {
                 if (string.IsNullOrEmpty(hash))
                 {
-                    Console.WriteLine("Missing required Option: hash");
+                    displayHelp("Missing required option: hash", options);
                 }
                 else
                 {
-                    Console.WriteLine("Missing required Option: username");
+                    displayHelp("Missing required option: username", options);
                 }
-                displayHelp();
-                Console.ReadKey();
-                return;
             }
 
 
@@ -980,9 +977,12 @@ namespace Sharp_InvokeWMIExec
         }
         
         //Begin Helper Functions.
-        public static void displayHelp()
+        public static void displayHelp(string message, OptionSet o)
         {
-            Console.WriteLine("Usage: Sharp-InvokeWMIExec.exe -h=\"hash\" -u=\"test\\username\" -t=\"target\" -c=\"command\" ");
+            Console.WriteLine("{0} \r\n Usage: Sharp-InvokeWMIExec.exe -h=\"hash\" -u=\"test\\username\" -t=\"target\" -c=\"command\" ", message);
+            o.WriteOptionDescriptions(Console.Error);
+            Console.ReadKey();
+            Environment.Exit(-1);
         }
         public static byte[] getByteRange(byte[] array, int start, int end)
         {
