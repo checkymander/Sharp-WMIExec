@@ -1,4 +1,4 @@
-# Sharp-InvokeWMIExec
+# Sharp-InvokeWMIExec (https://github.com/Kevin-Robertson/Invoke-TheHash/blob/master/Invoke-WMIExec.ps1)
 A native C# conversion of Kevin Robertsons Invoke-WMIExec powershell script.
 
 Built for .NET 4.5
