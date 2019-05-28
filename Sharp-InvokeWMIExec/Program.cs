@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Net;
-using Mono.Options;
+using PowerArgs;
 using System.Threading;
 using System.Security.Cryptography;
 using System.Diagnostics;
@@ -13,21 +13,66 @@ using System.Collections;
 
 namespace Sharp_InvokeWMIExec
 {
+    public class WMIExecArgs
+    {
+        [HelpHook, ArgShortcut("-?")]
+        public bool Help { get; set; }
+
+        [ArgShortcut("-u"), ArgDescription("Username to use for authentication"), ArgRequired()]
+        public string Username { get; set; }
+
+        [ArgShortcut("-h"), ArgDescription("NTLM Password hash for authentication. This module will accept either LM:NTLM or NTLM format"), ArgRequired()]
+        public string Hash { get; set; }
+
+        [ArgShortcut("-d"), ArgDescription("Domain to use for authentication. This parameter is not needed with local accounts or when using @domain after the username")]
+        public string Domain { get; set; }
+
+        [ArgShortcut("-t"), ArgDescription("Hostname or IP Address of the target.")]
+        public string Target { get; set; }
+
+        [ArgShortcut("-c"), ArgDescription("Command to execute on the target. If a command is not specified, the function will check to see if the username and hash provide local admin access on the target")]
+        public string Command { get; set; }
+
+        [ArgShortcut("-st"), ArgDescription("Time in seconds to sleep. Change this value if you're getting weird results."), ArgDefaultValue(15)]
+        public int Sleep { get; set; }
+
+        [ArgShortcut("-dbg"), ArgDescription("Switch, Enabled debugging"), ArgDefaultValue(false)]
+        public bool Debug { get; set; }
+    }
     class Program
     {
         static void Main(string[] args)
         {
+
+            WMIExecArgs parsed = null;
+            try
+            {
+                parsed = Args.Parse<WMIExecArgs>(args);
+            }
+            catch (MissingArgException e)
+            {
+                Console.WriteLine("Missing Required Parameter!");
+                Environment.Exit(0);
+            }
+
+
+            if (parsed == null)
+            {
+                Environment.Exit(0);
+            }
+
+
             //User Params
-            string command = "";
-            string hash = "";
-            string username = "";
+            string command = parsed.Command;
+            string hash = parsed.Hash;
+            string username = parsed.Username;
             string output_username = "";
-            bool debugging = false;
-            string domain = "";
-            string target = "";
+            bool debugging = parsed.Debug;
+            string domain = parsed.Domain;
+            string target = parsed.Target;
             string processID = "";
             string target_short = "";
-            int sleep = 5;
+            int sleep = parsed.Sleep;
 			bool show_help = false;
 
 			//Tracking Params
@@ -66,21 +111,11 @@ namespace Sharp_InvokeWMIExec
             int request_split_stage = 0;
 
 
-			OptionSet options = new OptionSet()
-			.Add("?:|help:", "Prints out the options.", h => show_help = true)
-			.Add("t=|target=", "Hostname or IP address of the target.", t => target = t)
-			.Add("u=|username=", "Username to use for authentication.", u => username = u)
-			.Add("d=|domain=", "Domain to use for authentication. This parameter is not needed with local accounts or when using @domain after the username.", d => domain = d)
-			.Add("h=|hash=", "NTLM password hash for authentication. This module will accept either LM:NTLM or NTLM format.", hsh => hash = hsh)
-			.Add("c=|command=", "Command to execute on the target. If a command is not specified, the function will check to see if the username and hash provides local admin access on the target.", option => command = option)
-			.Add("sleep=", "Time in seconds to sleep. Change this value if you're getting weird results.", option => sleep = int.Parse(option))
-			.Add("debug:", "Switch, enable debugging", option => debugging = true);
-			options.Parse(args);
 
 
 			if (show_help)
 			{
-				displayHelp(null,options);
+				displayHelp(null);
 				return;
 			}
 
@@ -101,11 +136,11 @@ namespace Sharp_InvokeWMIExec
             {
                 if (string.IsNullOrEmpty(hash))
                 {
-                    displayHelp("Missing required option: hash", options);
+                    displayHelp("Missing required option: hash");
                 }
                 else
                 {
-                    displayHelp("Missing required option: username", options);
+                    displayHelp("Missing required option: username");
                 }
             }
 
@@ -975,12 +1010,11 @@ namespace Sharp_InvokeWMIExec
                 Console.ReadLine();
             }
         }
-        
+
         //Begin Helper Functions.
-        public static void displayHelp(string message, OptionSet o)
+        public static void displayHelp(string message)
         {
             Console.WriteLine("{0} \r\n Usage: Sharp-InvokeWMIExec.exe -h=\"hash\" -u=\"test\\username\" -t=\"target\" -c=\"command\" ", message);
-            o.WriteOptionDescriptions(Console.Error);
             Console.ReadKey();
             Environment.Exit(-1);
         }
