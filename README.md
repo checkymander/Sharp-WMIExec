@@ -4,7 +4,7 @@ A native C# conversion of Kevin Robertsons Invoke-SMBExec powershell script. (ht
 Built for .NET 3.5
 
 # Usage
-Sharp-WMIExec.exe hash:"hash" username:"username" domain:"domain.tld" target:"target.domain.tld" command:"command"
+Sharp-WMIExec.exe hash:<hash> username:<username> domain:<domain> target:<target> command:<command>
 
 # Description
 This Assembly will allow you to execute a command on a target machine using WMI by providing an NTLM hash for the specified user.
