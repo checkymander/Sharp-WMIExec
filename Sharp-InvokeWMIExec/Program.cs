@@ -125,7 +125,7 @@ namespace Sharp_InvokeWMIExec
                 Environment.Exit(0);
 			}
 
-			if (!string.IsNullOrEmpty(command))
+			if (string.IsNullOrEmpty(command))
             {
                 AdminCheck = true;
             }
